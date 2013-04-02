@@ -131,7 +131,9 @@ void AnsReplace(char* input,int beginreplace,int appendhere,string streplace){
 	strncpy(&(input[beginreplace]),streplace.c_str(),streplace.size());
 	strncpy(&(input[beginreplace+streplace.size()]),appendthis.c_str(),appendthis.size());
 	input[beginreplace+streplace.size()+appendthis.size()]='\0';
-	cout << input << endl;
+	int initial=appendhere-beginreplace;
+	cout << initial << endl;
+	delete deletethis;
 	return;
 }
 
