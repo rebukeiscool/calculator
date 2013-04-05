@@ -4,15 +4,16 @@
 #include <iostream>
 #include "operation.h"
 #include "mylib.h"
+#include <string>
 using namespace std;
 
 int main()
 {
 	while(true){
-		char* input=getinput();
-		int endset=GetTermLoc(input);
-		solveset(input,0,&endset);
-		delete input;
+		string input=getinput();
+		int endset=input.size()-1;
+		const int startset=0;
+		solveset(&input,startset,&endset);
 	}
 	return 0;
 }

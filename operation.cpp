@@ -6,67 +6,57 @@
 #include "math.h"
 #include <cmath>
 using namespace std;
+#define BUFFER 50
 #define tempisnum ((int(input[tempcount])<58&&int(input[tempcount])>47)||(int(input[tempcount])==46))
 #define isnum ((int(input[counter])<58&&int(input[counter])>47)||(int(input[counter])==46))
-#define isop input[counter]=='+'||input[counter]=='-'||input[counter]=='*'||input[counter]=='/'||input[counter]=='('||input[counter]==')'||input[counter]=='^'
+#define isop (input[counter]=='+'||input[counter]=='-'||input[counter]=='*'||input[counter]=='/'||input[counter]=='('||input[counter]==')'||input[counter]=='^')
 #define isperiod input[counter]=='.'
 
-void solveset(char* input, int startset, int* endset){
-	DoParenth(input,startset,endset);
-	DoExp(input,startset,endset);
-	DoMultiDiv(input,startset,endset);
-	DoPlusMinus(input,startset,endset);
+void solveset(string* pstrinput, int startset, int* endset){
+	DoParenth(pstrinput,startset,endset);
+	DoExp(pstrinput,startset,endset);
+	//DoMultiDiv(pstrinput,startset,endset);
+	//DoPlusMinus(pstrinput,startset,endset);
 	return;
 }
 
-void DoExp(char* input, int startset, int* endset){
+void DoExp(string* pstrinput, int startset, int* endset){
+	char* input=new char[pstrinput->size()+1];
+	strcpy(input,pstrinput->c_str());
 	int counter=startset;
 	for(;counter<=*endset;counter++){
 		if(input[counter]=='^'){
-			int tempcount=counter-1;
-			for(;tempisnum;tempcount--){
-				if(tempcount<startset) break;
-				if(tempcount==0){
-					tempcount--;
-					break;
-				}
-			}
-			tempcount++;
-			int startreplace=tempcount;
+			if(counter==0){cout << "error. '^' found @ beginning of set" << endl;}
+			if(counter==*endset){cout << "error. '^' found @ end of set" << endl;}
 			double dleft=0;
-			double* pleft=&dleft;
-			getTerm(input,tempcount,pleft);
 			double dright=0;
+			double* pleft=&dleft;
 			double* pright=&dright;
-			
-			for(;tempisnum;tempcount++){
-				if(tempcount>*endset){
-					cout << "error. right term is outside of set" << endl;
-					return;
-				}
-			}
-			tempcount++;
-			getTerm(input,tempcount,pright);
-			double danswer=pow(dleft,dright);
-			string stanswer= to_string(danswer);
-
-			for(;tempisnum;tempcount++){}
-			int appendhere=tempcount;
-			AnsReplace(input,startreplace,appendhere,stanswer);
+			getTerm(pstrinput,LocateLeftTerm(pstrinput,counter),pleft);
+			getTerm(pstrinput,LocateRightTerm(pstrinput,counter),pright);
+			double danswer=0;
+			danswer+=pow(dleft,dright);
+			string streplace = to_string(danswer);
+			AnsReplace(pstrinput,LocateLeftTerm(pstrinput,counter),GetEndBinaryOp(pstrinput,counter)+1,streplace,endset);
+			break;
 		}
+		else{continue;}
 	}
+	delete[] input;
 	return;
 }
 
-void DoMultiDiv(char* input, int startset, int* endset){
+void DoMultiDiv(string* pstrinput, int startset, int* endset){
 	return;
 }
 
-void DoPlusMinus(char* input, int startset, int* endset){
+void DoPlusMinus(string* pstrinput, int startset, int* endset){
 	return;
 }
 
-void getTerm(char* input,int counter,double* term){
+void getTerm(string* pstrinput,int counter,double* term){
+	char* input=new char[pstrinput->size()+1];
+	strcpy(input,pstrinput->c_str());
 	if(!isnum){
 		cout << "error in getTerm. current char is "<< input[counter] << endl;
 		return;
@@ -111,32 +101,58 @@ void getTerm(char* input,int counter,double* term){
 		}
 	}
 	if(!ndecimal) *term/=power(10,ndigit);
+	delete[] input;
 	return;
 }
 
-void DoParenth(char* input,int startset,int* endset){
+void DoParenth(string* pstrinput,int startset,int* endset){
 	return;
 }
 
-void AnsReplace(char* input,int beginreplace,int appendhere,string streplace){
-	int counter=appendhere;
-	int tempcount=0;
-	string appendthis="";
-	string stinput="";
-	for(;input[counter]!='\0';counter++,tempcount++){}
-	appendthis.append(&(input[appendhere]),tempcount);
-	char* deletethis=&(input[0]);
-	input = new char[strlen(input)];
-	strncpy(input,deletethis,beginreplace);
-	strncpy(&(input[beginreplace]),streplace.c_str(),streplace.size());
-	strncpy(&(input[beginreplace+streplace.size()]),appendthis.c_str(),appendthis.size());
-	input[beginreplace+streplace.size()+appendthis.size()]='\0';
-	int initial=appendhere-beginreplace;
-	cout << initial << endl;
-	delete deletethis;
+void AnsReplace(string* pstrinput,int beginreplace,int appendhere,string streplace,int* endset){
+	string strinput="";
+	string append="";
+	append.append(*pstrinput,appendhere,BUFFER);
+	strinput.append(*pstrinput,0,beginreplace);
+	strinput.append(streplace);
+	strinput.append(append);
+	int addtoendset=strinput.size()-pstrinput->size();
+	*endset+=addtoendset;
+	*pstrinput=strinput;
 	return;
 }
 
-void HandleParenth(char* input,int openpar,int* closepar){
+void HandleParenth(string* pstrinput,int openpar,int* closepar){
 	return;
+}
+
+int LocateLeftTerm(string* pstrinput,int counter){
+	char* input=new char[pstrinput->size()+1];
+	strcpy(input,pstrinput->c_str());
+	if(!isop){cout << "error. input[counter] in LocateLeftTerm is not an operator" << endl;}
+	for(counter--;isnum;counter--){
+		if(counter==0){
+			counter--;
+			break;
+		}
+	}
+	counter++;
+	delete[] input;
+	return counter;
+}
+
+int LocateRightTerm(string* pstrinput,int counter){
+	char* input=new char[pstrinput->size()+1];
+	strcpy(input,pstrinput->c_str());
+	if(!isop){cout << "error. input[counter] in LocateRightTerm is not an operator" << endl;}
+	delete[] input;
+	return counter+1;
+}
+
+int GetEndBinaryOp(string* pstrinput,int counter){
+	char* input=new char[pstrinput->size()+1];
+	strcpy(input,pstrinput->c_str());
+	if(!isop){cout << "error. input[counter] in GetEndBinaryOp is not an operator" << endl;}
+	for(counter++;isnum;counter++){}
+	return counter-1;
 }

@@ -1,6 +1,32 @@
 #include "stdafx.h"
 #include <iostream>
+#include <string>
 using namespace std;
+
+char* resize(char* cnarray){  //function that takes a character array as an argument and returns a pointer to a new array that is the right size
+	int sizeofarray = 0;
+	for(sizeofarray=0;cnarray[sizeofarray]!='\0';sizeofarray++){}
+	char* input = new char[sizeofarray];
+	for(sizeofarray=0;input[sizeofarray]!='\0';sizeofarray++){
+		input[sizeofarray]=cnarray[sizeofarray];
+	}
+	return input;
+}
+
+void parsearray(char* cnarray){
+	int counter=0;
+	for(;;counter++){
+		cout << "parsearray called" << endl << endl << counter+1 << "th element___" << cnarray[counter] << "___" << char(cnarray[counter]) << "___" << int(cnarray[counter]);
+		if(cnarray[counter])
+			cout << "___true" << endl;
+		else cout << "___false" << endl;
+		if(cnarray[counter]=='\0'){
+			cout << "terminating char reached @ index of " << counter << endl;
+			break;
+		}
+	}
+	return;
+}
 
 void delspace(char* input){
 	int icnt=0;
@@ -41,16 +67,19 @@ double power(double base, double power){
 	return returnvalue;
 }
 
-char* getinput(){
-	char* input=new char[50];
+string getinput(){
+	string input="";
 	cout << "Enter problem" << endl;
-	cin.getline(input,50,'\n');
-	int counter=0;
-	for(;input[counter];counter++){}
-	input[counter]='\0';
+	getline(cin,input);
 	return input;
 }
 
+void AddTermChar(char* cstring){
+	int counter=0;
+	for(;cstring[counter];counter++){}
+	cstring[counter]='\0';
+	return;
+}
 
 int GetTermLoc(char* cstring){
 	if(!cstring){
