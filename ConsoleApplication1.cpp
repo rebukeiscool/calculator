@@ -14,6 +14,7 @@ int main()
 		int endset=input.size()-1;
 		const int startset=0;
 		solveset(&input,startset,&endset);
+		cout << input << endl;
 	}
 	return 0;
 }

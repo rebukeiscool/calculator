@@ -6,7 +6,7 @@
 #include "math.h"
 #include <cmath>
 using namespace std;
-#define BUFFER 50
+#define BUFFER 100
 #define tempisnum ((int(input[tempcount])<58&&int(input[tempcount])>47)||(int(input[tempcount])==46))
 #define isnum ((int(input[counter])<58&&int(input[counter])>47)||(int(input[counter])==46))
 #define isop (input[counter]=='+'||input[counter]=='-'||input[counter]=='*'||input[counter]=='/'||input[counter]=='('||input[counter]==')'||input[counter]=='^')
@@ -15,13 +15,13 @@ using namespace std;
 void solveset(string* pstrinput, int startset, int* endset){
 	DoParenth(pstrinput,startset,endset);
 	DoExp(pstrinput,startset,endset);
-	//DoMultiDiv(pstrinput,startset,endset);
-	//DoPlusMinus(pstrinput,startset,endset);
+	DoMultiDiv(pstrinput,startset,endset);
+	DoPlusMinus(pstrinput,startset,endset);
 	return;
 }
 
 void DoExp(string* pstrinput, int startset, int* endset){
-	char* input=new char[pstrinput->size()+1];
+	char* input=new char[BUFFER];
 	strcpy(input,pstrinput->c_str());
 	int counter=startset;
 	for(;counter<=*endset;counter++){
@@ -38,7 +38,56 @@ void DoExp(string* pstrinput, int startset, int* endset){
 			danswer+=pow(dleft,dright);
 			string streplace = to_string(danswer);
 			AnsReplace(pstrinput,LocateLeftTerm(pstrinput,counter),GetEndBinaryOp(pstrinput,counter)+1,streplace,endset);
-			break;
+			strcpy(input,pstrinput->c_str());
+			counter=startset-1;
+			continue;
+		}
+		else{
+			continue;
+		}
+	}
+	delete[] input;
+	return;
+}
+
+void DoMultiDiv(string* pstrinput, int startset, int* endset){
+	char* input=new char[BUFFER];
+	strcpy(input,pstrinput->c_str());
+	int counter=startset;
+	for(;counter<=*endset;counter++){
+		if(input[counter]=='*'){
+			if(counter==0){cout << "error. '*' found @ beginning of set" << endl;}
+			if(counter==*endset){cout << "error. '*' found @ end of set" << endl;}
+			double dleft=0;
+			double dright=0;
+			double* pleft=&dleft;
+			double* pright=&dright;
+			getTerm(pstrinput,LocateLeftTerm(pstrinput,counter),pleft);
+			getTerm(pstrinput,LocateRightTerm(pstrinput,counter),pright);
+			double danswer=0;
+			danswer+=dleft*dright;
+			string streplace = to_string(danswer);
+			AnsReplace(pstrinput,LocateLeftTerm(pstrinput,counter),GetEndBinaryOp(pstrinput,counter)+1,streplace,endset);
+			strcpy(input,pstrinput->c_str());
+			counter=startset-1;
+			continue;
+		}
+		else if(input[counter]=='/'){
+			if(counter==0){cout << "error. '/' found @ beginning of set" << endl;}
+			if(counter==*endset){cout << "error. '/' found @ end of set" << endl;}
+			double dleft=0;
+			double dright=0;
+			double* pleft=&dleft;
+			double* pright=&dright;
+			getTerm(pstrinput,LocateLeftTerm(pstrinput,counter),pleft);
+			getTerm(pstrinput,LocateRightTerm(pstrinput,counter),pright);
+			double danswer=0;
+			danswer+=dleft/dright;
+			string streplace = to_string(danswer);
+			AnsReplace(pstrinput,LocateLeftTerm(pstrinput,counter),GetEndBinaryOp(pstrinput,counter)+1,streplace,endset);
+			strcpy(input,pstrinput->c_str());
+			counter=startset-1;
+			continue;
 		}
 		else{continue;}
 	}
@@ -46,11 +95,48 @@ void DoExp(string* pstrinput, int startset, int* endset){
 	return;
 }
 
-void DoMultiDiv(string* pstrinput, int startset, int* endset){
-	return;
-}
-
 void DoPlusMinus(string* pstrinput, int startset, int* endset){
+	char* input=new char[BUFFER];
+	strcpy(input,pstrinput->c_str());
+	int counter=startset;
+	for(;counter<=*endset;counter++){
+		if(input[counter]=='+'){
+			if(counter==0){cout << "error. '+' found @ beginning of set" << endl;}
+			if(counter==*endset){cout << "error. '+' found @ end of set" << endl;}
+			double dleft=0;
+			double dright=0;
+			double* pleft=&dleft;
+			double* pright=&dright;
+			getTerm(pstrinput,LocateLeftTerm(pstrinput,counter),pleft);
+			getTerm(pstrinput,LocateRightTerm(pstrinput,counter),pright);
+			double danswer=0;
+			danswer+=dleft+dright;
+			string streplace = to_string(danswer);
+			AnsReplace(pstrinput,LocateLeftTerm(pstrinput,counter),GetEndBinaryOp(pstrinput,counter)+1,streplace,endset);
+			strcpy(input,pstrinput->c_str());
+			counter=startset-1;
+			continue;
+		}
+		else if(input[counter]=='-'){
+			if(counter==0){cout << "error. '-' found @ beginning of set" << endl;}
+			if(counter==*endset){cout << "error. '-' found @ end of set" << endl;}
+			double dleft=0;
+			double dright=0;
+			double* pleft=&dleft;
+			double* pright=&dright;
+			getTerm(pstrinput,LocateLeftTerm(pstrinput,counter),pleft);
+			getTerm(pstrinput,LocateRightTerm(pstrinput,counter),pright);
+			double danswer=0;
+			danswer+=dleft-dright;
+			string streplace = to_string(danswer);
+			AnsReplace(pstrinput,LocateLeftTerm(pstrinput,counter),GetEndBinaryOp(pstrinput,counter)+1,streplace,endset);
+			strcpy(input,pstrinput->c_str());
+			counter=startset-1;
+			continue;
+		}
+		else{continue;}
+	}
+	delete[] input;
 	return;
 }
 
